@@ -1,5 +1,25 @@
 # i2cmeter1
-Standalone Signal Analyzer (I2C Type Signal-Meter) for uBITX - Arduino Nano Version
+Standalone Signal Analyzer (I2C Type Signal-Meter) for uBITX - Non-Arduino Nano Version
+
+This repository is a fork of https://github.com/soligen2010/dspmeterv1
+
+The primary purpose of this effort is to extend the code to support platforms other than just the Arduino Nano.
+
+Note: There are two versions of the Standalone Signal Analyzer: i2cmeter1 and i2cmeter2.
+
+i2cmeter1 is based on Ian KD8CEC's original code. i2cmeter2 is the result of significant effort by Dennis Soligen
+and looks like am amazing upgrade.
+
+My initial effort will be focused on getting the original KD8CEC (i2cmeter1) working on the RP2040 chip. Once successful
+I look forward to porting the V2 code too.
+
+What follows is the original README copy from the GITHUB location provided above.
+
+73
+Mark
+AJ6CU
+---------------------------------------------------------
+
 
 I do not claim any license for my code.
 You may use it in any way. I just hope this will be used for amateur radio.
