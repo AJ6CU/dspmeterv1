@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+#ifdef USE_SW_SERIAL
 #ifndef AltSoftSerial_h
 #define AltSoftSerial_h
 
@@ -77,7 +77,7 @@ private:
 
 // Arduino Uno, Duemilanove, LilyPad, etc
 //
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
+// #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 
   #define ALTSS_USE_TIMER1
   #define INPUT_CAPTURE_PIN     8 // receive
@@ -110,8 +110,9 @@ private:
   #define COMPARE_B_INTERRUPT   TIMER1_COMPB_vect
 
 // Unknown board
-#else
-#error "Please define your board timer and pins"
-#endif
+// #else
+// #error "Please define your board timer and pins"
+// #endif
 
+#endif
 #endif

@@ -30,7 +30,7 @@
 //
 // Version 1.0: Initial Release
 
-
+#ifdef USE_SW_SERIAL
 #include "AltSoftSerial.h"
 
 // These were incorporated into AltSoftSerial.h for ATMEGA328p only
@@ -372,4 +372,5 @@ void ftm0_isr(void)
   if (flags & (1<<5)) altss_capture_interrupt();
   if (flags & (1<<6) && (FTM0_C6SC & 0x40)) altss_compare_a_interrupt();
 }
+#endif
 #endif

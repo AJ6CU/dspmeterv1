@@ -10,7 +10,7 @@ License : See fftfunctions.cpp for FFT and CW Decode.
 #include <Wire.h>
 #include <EEPROM.h>
 #include "i2cmeter2.h"
-#include "AltSoftSerial.h"
+// #include "AltSoftSerial.h"
 #include "CWDecoder.h"
 #include "fftfunctions.h"
 #include "NextionProtocol.h"
@@ -205,7 +205,8 @@ void loop()
   }
 } //end of main loop
 
-void I2CReceiveEvent(void)
+void I2CReceiveEvent(int)
+// void I2CReceiveEvent(void)
 {
   int readCommand = 0; // byte를 읽어 int로 변환  
   

@@ -9,7 +9,7 @@
 
 #ifndef NextionProtocol_h
 #define NextionProtocol_h
-#include "AltSoftSerial.h"
+// #include "AltSoftSerial.h"
 #include <arduino.h>
 #include "Configuration.h"
 #include "i2cmeter2.h"
@@ -90,7 +90,8 @@ class NextionProtocol
   void SendCommandEnding(char varIndex);
   void SendCommandStrEnding(char varIndex);
   bool SendDecodeCharacters(char *characters);
-  int ForwardData(void);
+  void ForwardData(void);
+    // int ForwardData(void);
   void SendScaledSMeter(int meterToUartInterval);
   void CalculateScaledSMeter(int ADC_DIFF);
   void SendFFTData(int readSampleCount, int *readArray);
@@ -139,7 +140,8 @@ class NextionProtocol
   bool nextionIsConnected = false; // This gets set to true as soon as inbound serial data arrives.
 
 protected:
-  void CommandParser(char* ForwardBuff, int lastIndex);
+  void CommandParser(uint8_t* ForwardBuff, int lastIndex);
+  // void CommandParser(char* ForwardBuff, int lastIndex);
 
   uint8_t cwDecodeHz = 9;
   uint8_t responseCommand = 0;  

@@ -52,8 +52,8 @@ License: Same as origial code.
 #define I2CMETER_CALCR    0x55 //Calculated Reversse Power Meter
 #define I2CMETER_UNCALCR  0x54 //Uncalculated Reversse Power Meter
 
-#define SIGNAL_METER_ADC  A7
-#define POWER_METER_ADC   A3
+#define SIGNAL_METER_ADC  A1 //A7
+#define POWER_METER_ADC   A0 //A3
 #define REV_POWER_METER_ADC     A2
 
 #endif // I2CMETER2_H

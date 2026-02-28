@@ -1,0 +1,518 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c100000\c100000;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 \cb2 \expnd0\expndtw0\kerning0
+Page
+\fs43\fsmilli21750 \
+\
+Preinitialize
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 pm.vv.val=-1\
+pm.vg.val=0\
+pm.sp.txt="J"\
+pm.sb.txt="^"\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 \
+Buttons
+\fs43\fsmilli21750 \
+\
+bHome\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+\
+page px\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 cSmeterToUart (checkbox to enable remote processor)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+\
+randset 5,255\
+nMyAddr.val=rand\
+//Send\
+pm.vn.val=-1\
+pm.vx.val=0\
+printh 59										//MAGIC\
+printh 58										//MAGIC\
+printh 68										//MAGIC\
+prints 74,1									//Command : LOOP BACK\
+prints nMyAddr.val,1				//Loop Sender :\
+sys0=50+cSmeterToUart.val		//SMeterToUart\
+prints sys0,1									//Loop Command1 : Command Type / 95: Spectrum Mode\
+prints 0x6A,1								//Loop Command2 : Command Value / 0x6A to DSP\
+sys0=nMyAddr.val+sys0+0x6A\
+sys0=sys0%256\
+prints sys0,1										//Loop Command3 : Command Value / CheckSum\
+printh FF										//MAGIC\
+printh FF										//MAGIC\
+printh 73										//ETX\
+\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 b0 (Set limit)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+\
+randset 5,255\
+nMyAddr.val=rand\
+//Send\
+pm.vv.val=-1\
+pm.vg.val=0\
+sys1=146+h0.val\
+printh 59										//MAGIC\
+printh 58										//MAGIC\
+printh 68										//MAGIC\
+prints 74,1									//Command : LOOP BACK\
+prints nMyAddr.val,1				//Loop Sender :\
+prints sys1,1								//Loop Command1 : Command Type / 100~129: Decode Morse\
+prints 0x6A,1								//Loop Command2 : Command Value / 0x6A to DSP\
+sys0=nMyAddr.val+sys1+0x6A\
+sys0=sys0%256\
+prints sys0,1								//Loop Command3 : Command Value / CheckSum\
+printh FF										//MAGIC\
+printh FF										//MAGIC\
+printh 73										//ETX\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 b1 (Perhaps no opt?)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 No events. 10 char max, defaults to empty string
+\fs24 \ulnone \
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 h0 (slider)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+\
+randset 5,255\
+nMyAddr.val=rand\
+//Send\
+pm.vn.val=-1\
+pm.vx.val=0\
+printh 59										//MAGIC\
+printh 58										//MAGIC\
+printh 68										//MAGIC\
+prints 74,1									//Command : LOOP BACK\
+prints nMyAddr.val,1				//Loop Sender :\
+sys0=146+h0.val							//CW Limit\
+prints sys0,1								//Loop Command1 : Command Type\
+prints 0x6A,1								//Loop Command2 : Command Value / 0x6A to DSP\
+sys0=nMyAddr.val+sys0+0x6A\
+sys0=sys0%256\
+prints sys0,1								//Loop Command3 : Command Value / CheckSum\
+printh FF										//MAGIC\
+printh FF										//MAGIC\
+printh 73										//ETX\
+\
+
+\fs28 \ul TouchMoveEvent
+\fs24 \ulnone \
+\
+n1.val=h0.val*10\
+\
+Max= 10, Min=0, Default=2\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 nHigh \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 No events
+\fs24 \ulnone \
+\
+Defined as Decimal\
+Default 0\
+\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 n0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 No events
+\fs24 \ulnone \
+\
+Defined as Decimal\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul Default 20\ulnone \
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 nLow\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 No events
+\fs24 \ulnone \
+\
+Defined as Decimal\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul Default 0\ulnone \
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 nDecodeFreq\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+\
+sys0=hCWTone.val*50\
+nDecodeFreq.val=sys0+300\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul Default 800\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 \ulnone hCWTone (slider)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchMoveEvent
+\fs24 \ulnone \
+click nDecodeFreq,1\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul Default 10, min 0, max 45\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 \ulnone rFFT (radio button 1)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+if(rFFT.val==1)\
+\{\
+  rMorse.val=0\
+\}\
+//else\
+//\{\
+//  rMorse.val=1\
+//\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 rMorse (radio button 2)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+if(rMorse.val==1)\
+\{\
+  rFFT.val=0\
+\}\
+//else\
+//\{\
+//  rFFT.val=1\
+//\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 bSetCommand (apply)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+randset 5,255\
+nMyAddr.val=rand\
+//Send\
+pm.vv.val=-1\
+pm.vg.val=0\
+if(rFFT.val==1)	//Spctrum Mode\
+\{\
+  sys1=95\
+\}else if(rMorse.val==1)\
+\{		//Morse Decode\
+sys1=nDecodeFreq.val-300\
+sys1/=50\
+sys1+=100										//Decode Morse 100~129\
+\}else\
+\{\
+sys1=94\
+\}\
+printh 59										//MAGIC\
+printh 58										//MAGIC\
+printh 68										//MAGIC\
+prints 74,1									//Command : LOOP BACK\
+prints nMyAddr.val,1				//Loop Sender :\
+prints sys1,1								//Loop Command1 : Command Type / 100~129: Decode Morse\
+prints 0x6A,1								//Loop Command2 : Command Value / 0x6A to DSP\
+sys0=nMyAddr.val+sys1+0x6A\
+sys0=sys0%256\
+prints sys0,1								//Loop Command3 : Command Value / CheckSum\
+printh FF										//MAGIC\
+printh FF										//MAGIC\
+printh 73	\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tDecode1\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+None\
+\
+String length 30\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tDecode2\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+None\
+\
+String length 30\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tDecode3\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchPressEvent
+\fs24 \ulnone \
+None\
+\
+String length 30\
+\
+\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 Timers
+\fs43\fsmilli21750 \
+tm1\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 if(pm.sp.txt!="J")\
+\{\
+  //fill 0,0,240,70,BLACK\
+  //vMaxValue.val=0\
+  //vMinValue.val=30000\
+  //sys1=nDecodeFreq.val/48\
+  sys1=nDecodeFreq.val/50\
+  sys1=sys1+1\
+  vSelectMin.val=sys1-1\
+  vSelectMax.val=sys1+1\
+  sys1=sys1*4\
+  sys2=0\
+  for(sys0=0;sys0<62;sys0++)\
+  \{\
+    substr pm.sp.txt,sTemp0.txt,sys0*2,2\
+    covx sTemp0.txt,sys2,2,2\
+    sys2/=2\
+    if(sys2<0)\
+    \{\
+      sys2=0\
+    \}\
+    if(sys2>70)\
+    \{\
+      sys2=70\
+    \}\
+    //if(vMaxValue.val<sys2)\
+    //\{\
+    //  vMaxValue.val=sys2\
+    //\}\
+    //if(vMinValue.val>sys2)\
+    //\{\
+    //  vMinValue.val=sys2\
+    //\}\
+    //sys1=sys0*2\
+    //sys1+=194\
+    //fill sys0*2,71-sys2,2,sys2,YELLOW		//1500+sys1*2046\
+    //fill sys0*2,0,2,71-sys2,BLACK				//1500+sys1*2046\
+    //fill sys0*4,240-sys2,4,sys2,YELLOW	//1500+sys1*2046\
+    //fill sys0*4,170,4,70-sys2,BLACK			//1500+sys1*2046\
+    fill sys0*4+9,110-sys2,4,sys2,YELLOW	//1500+sys1*2046\
+    fill sys0*4+9,39,4,71-sys2,BLACK			//1500+sys1*2046\
+    if(sys0>vSelectMin.val)\
+    \{\
+      if(sys0<vSelectMax.val)\
+      \{\
+        line sys1,40,sys1,109,RED\
+        line sys1+4,40,sys1+4,109,RED\
+      \}\
+    \}\
+    //if(sys1>nADCDisVal.val)					//maximum adc dccharget\
+    //\{\
+    //  sys2=sys1-nADCDisVal.val\
+    //\}\
+    //sys2=sys1*90	//80%\
+    //sys2/=100\
+  \}\
+  pm.sp.txt="J"\
+  //Draw Decode Frequency\
+  //sys1=nDecodeFreq.val/48\
+  //sys1=sys1*4\
+  //sys1+=4	//drop bin0 of FFT\
+  //fill sys1,0,2,71,RED\
+  //Graph LIne\
+  //fill 9,110-n1.val,246,1,BLUE\
+  //Needle\
+  //line sys1,40,sys1,109,RED\
+  //line sys1+4,40,sys1+4,109,RED\
+  //Display High and Low value\
+  //sys0=nHigh.val*7\
+  //sys1=vMaxValue.val*3\
+  //sys0+=sys1\
+  //sys0/=10\
+  //nHigh.val=sys0\
+  //sys0=nLow.val*7\
+  //sys1=vMinValue.val*3\
+  //sys0+=sys1\
+  //sys0/=10\
+  //nLow.val=sys0\
+  //fill 9,110-nHigh.val,246,1,GRAY\
+  //nRecvCount.val--\
+  //nArriveValue.val=0\
+  //if(nRecvCount.val<1)\
+  //\{\
+  //  click b1,1\
+  //\}\
+\}else if(pm.sb.txt!="^")\
+\{\
+  if(vLineIndex.val==0)\
+  \{\
+    tDecode1.txt=tDecode1.txt+pm.sb.txt\
+    strlen tDecode1.txt,sys0\
+    if(sys0>23)\
+    \{\
+      vLineIndex.val=1\
+    \}\
+  \}else if(vLineIndex.val==1)\
+  \{\
+    tDecode2.txt=tDecode2.txt+pm.sb.txt\
+    strlen tDecode2.txt,sys0\
+    if(sys0>23)\
+    \{\
+      vLineIndex.val=2\
+    \}\
+  \}else if(vLineIndex.val==2)\
+  \{\
+    strlen tDecode3.txt,sys0\
+    if(sys0>23)\
+    \{\
+      tDecode1.txt=tDecode2.txt\
+      tDecode2.txt=tDecode3.txt\
+      tDecode3.txt=""\
+    \}\
+    tDecode3.txt=tDecode3.txt+pm.sb.txt\
+  \}\
+  pm.sb.txt="^"\
+\}else if(vReadStep.val==0)\
+\{\
+  vReadStep.val=1\
+  pm.vv.val=-1\
+  pm.vg.val=0\
+  //Read Configuration from DSP\
+  randset 5,255\
+  nMyAddr.val=rand\
+  printh 59										//MAGIC\
+  printh 58										//MAGIC\
+  printh 68										//MAGIC\
+  prints 74,1									//Command : LOOP BACK\
+  prints nMyAddr.val,1				//Loop Sender :\
+  prints 2,1									//Loop Command1 : Command Type / 1~5: Read Configuration\
+  prints 0x6A,1								//Loop Command2 : Command Value / 0x6A to DSP\
+  sys0=nMyAddr.val+2+0x6A			//Byte0 + Byte1 + Byte2 % 256 = Checksum\
+  sys0=sys0%256\
+  prints sys0,1								//Loop Command3 : Command Value / CheckSum\
+  printh FF										//MAGIC\
+  printh FF										//MAGIC\
+  printh 73										//ETX\
+\}else if(vReadStep.val==1)\
+\{\
+  if(pm.vg.val==0x6A)					//Response from DSP\
+  \{\
+    vReadStep.val=2\
+    sys0=pm.vv.val&0xFF\
+    sys1=pm.vv.val>>8\
+    sys1=sys1&0xFF\
+    sys2=pm.vv.val>>16\
+    sys2=sys2&0xFF\
+    //sys0 : magLimit\
+    //sys1 : SMeterToUart\
+    //sys2 : DSPType and Morse Decode HZ\
+    if(sys0>100)\
+    \{\
+      sys0=100\
+    \}\
+    n1.val=sys0\
+    sys0=sys0/10\
+    h0.val=sys0\
+    if(sys1==1)\
+    \{\
+      cSmeterToUart.val=1\
+    \}else\
+    \{\
+      cSmeterToUart.val=0\
+    \}\
+    if(sys2==95)\
+    \{\
+      rFFT.val=1\
+      rMorse.val=0\
+    \}else if(sys2>=100)\
+    \{\
+      if(sys2<146)\
+      \{\
+        rFFT.val=0\
+        rMorse.val=1\
+        hCWTone.val=sys2-100\
+        //nDecodeFreq.val=sys2\
+        click nDecodeFreq,1\
+      \}\
+    \}\
+    pm.vv.val=-1\
+    pm.vg.val=0\
+  \}\
+\}\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf0 \
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 Variables
+\fs43\fsmilli21750 \
+nMyAddr:		Number	0\
+sTemp0:		String		Max length 10\
+vReadStep:	Number	0\
+vSelectMin:	Number	0\
+vSelectMax:	Number	0\
+vLineIndex:	Number	0\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+}

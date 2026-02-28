@@ -11,7 +11,7 @@
 #include "Configuration.h"
 #include "i2cmeter2.h"
 #include "NextionProtocol.h"
-#include "AltSoftSerial.h"
+// #include "AltSoftSerial.h"
 #include "fftfunctions.h"
 #include <EEPROM.h>
 
@@ -117,7 +117,8 @@ void NextionProtocol::SendCommandStrEnding(char varIndex)
 }
 
 //Result : if found .val=, 1 else 0
-void NextionProtocol::CommandParser(char* ForwardBuff, int lastIndex)
+void NextionProtocol::CommandParser(uint8_t* ForwardBuff, int lastIndex)
+// void NextionProtocol::CommandParser(char* ForwardBuff, int lastIndex)
 {
   //Analysing Forwrd data
   //59 58 68 4A   1C 5F 6A E5     FF FF 73 
@@ -145,7 +146,9 @@ void NextionProtocol::CommandParser(char* ForwardBuff, int lastIndex)
       uint8_t command2 = ForwardBuff[i-5];  //v
                               //     i-4    //.
       ForwardBuff[lastIndex - 2] = 0;
-      long commandVal=atol(&ForwardBuff[i + 1]);
+
+      long commandVal=atol((const char*) &ForwardBuff[i + 1]);
+      // long commandVal=atol(&ForwardBuff[i + 1]);
       uint8_t *ReadBuff = (uint8_t *)&commandVal;
                               
       //Loop Back
@@ -273,7 +276,8 @@ void NextionProtocol::CommandParser(char* ForwardBuff, int lastIndex)
   return;
 }
 
-int NextionProtocol::ForwardData(void)
+void NextionProtocol::ForwardData(void)
+// int NextionProtocol::ForwardData(void)
 {
   static uint8_t etxCount = 0;  // static so value is retained between executions       
   static uint8_t nowBuffIndex = 0;   // static so value is retained between executions
@@ -457,7 +461,8 @@ void NextionProtocol::SendFFTData(int readSampleCount, int *readArray)
   SendCommandStrEnding(CMD_SMETER);
 }
 
-bool NextionProtocol::SendPowerSwr(float power, float swr, bool sendSwrAsSmeter = true)
+bool NextionProtocol::SendPowerSwr(float power, float swr, bool sendSwrAsSmeter)
+// bool NextionProtocol::SendPowerSwr(float power, float swr, bool sendSwrAsSmeter = true)
 {
   // Send SWR as S meter value.  This is for comaptibility with Dr. Lee's version
   uint8_t SmeterSwrValue = constrain((uint8_t)(((swr - 1.0) * SMETER_RESOLUTION_MULTIPLIER) + 0.5), 1, 9 * SMETER_RESOLUTION_MULTIPLIER);  // Subtract 1 so the SMeter is zero based.

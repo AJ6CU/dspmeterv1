@@ -9,7 +9,7 @@ WC8C, Dennis Cabell
 #define CONFIGURATION_H
 
 // comment this line out of you want to run hardware serial (wire to pin 0 instead of pin 9)
-#define USE_SW_SERIAL
+//#define USE_SW_SERIAL
 
 ///////////////////////////////////////////////////
 // To use a speed other than 9600, you must modify the Raduino CEC firmware and 

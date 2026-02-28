@@ -1,0 +1,923 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c100000\c100000;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 \cb2 \expnd0\expndtw0\kerning0
+App\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs24 \cf0 //The following code is only run once when power on, and is generally used for global variable definition and power on initialization data\
+int sys0=0,sys1=0,sys2=0     //At present, the definition of global variable only supports 4-byte signed integer (int), and other types of global quantity declaration are not supported. If you want to use string type, you can use variable control in the page to implement\
+baud=9600//Configure baudrate\
+dim=100//Configure backlight\
+recmod=0//Serial data parsing mode:0-Passive mode;1-Active mode\
+printh 00 00 00 ff ff ff 88 ff ff ff//Output power on information to serial port\
+page 0                       //Power on start page 0\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 \
+Page
+\fs43\fsmilli21750 \
+\
+Preinitialize
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 if(TxMode.val==0)\
+\{\
+  vis swr,0\
+  vis pwr,0\
+  pswr.fwdPowerSave.val=0\
+  pswr.swrSave.val=10\
+  pswr.SWRBarSave.val=0\
+\}else\
+\{\
+  vis swr,1\
+  vis pwr,1\
+\}\
+//Hide Mode Buttons\
+vis bLSB,0\
+vis bUSB,0\
+vis bCWL,0\
+vis bCWU,0\
+//Hide IFS\
+vis hIFS,qIFS.picc //found bug by VE1BWV\
+//Hide Text Line for compatiable with Character LCD\
+vis t0,0\
+vis t1,0\
+vis nCWNum,0\
+vis tCWText,0\
+vis bAction,0\
+//Added Version 1.1\
+vis bStep1,0\
+vis bStep2,0\
+vis bStep3,0\
+vis bStep4,0\
+vis bStep5,0\
+pm.vv.val=-1\
+pm.vg.val=0\
+pm.sp.txt="J"\
+pm.sb.txt="^"\
+vis tDecode1,0\
+vDecodeVisible.val=0\
+if(nQuickMenu.val==1)\
+\{\
+  //CW Menu\
+  qKey.picc=1\
+  vis nQWPM,1\
+  vis tQKeyType,1\
+  vis b0,1\
+  vis b1,1\
+  vis b2,1\
+  vis hATT,0\
+  vis hIFS,0\
+  vis nATT,0\
+  vis nIFS,0\
+\}else\
+\{\
+  //Normal\
+  qKey.picc=0\
+  vis nQWPM,0\
+  vis tQKeyType,0\
+  vis b0,0\
+  vis b1,0\
+  vis b2,0\
+  vis hATT,1\
+  vis hIFS,qIFS.picc\
+  vis nATT,1\
+  vis nIFS,1\
+\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 Postinitialize
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 pm.cm.val=99 // causes timer to update the swr/pwr display\
+if(TxMode.val==0)\
+\{\
+  vis swr,0\
+  vis pwr,0\
+  pswr.fwdPowerSave.val=0\
+  pswr.swrSave.val=10\
+  pswr.SWRBarSave.val=0\
+\}else\
+\{\
+  vis swr,1\
+  vis pwr,1\
+\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 TouchPressEvent
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 pm.cm.val=99 // causes timer to update the swr/pwr display\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 Buttons
+\fs43\fsmilli21750 \
+swr\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+page pswr\
+\
+String max length 10\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 pwr\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf0 \ul \ulc0 TouchReleaseEvent
+\fs24 \ulnone \
+None\
+\
+String max length 10\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs72 \cf0 Timers
+\fs43\fsmilli21750 \
+tmMain
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 //===================================\
+// Nextion LCD -> Process for MCU\
+//===================================\
+//===================================\
+//SEND COMMAND STX(3BYTE) + COMMAND + DATA (4byte) + ETX(3BYTE)\
+//===================================\
+if(rSendNeed.val==1)				//Check Need transsfer\
+\{\
+  printh 59										//MAGIC\
+  printh 58										//MAGIC\
+  printh 68										//MAGIC\
+  prints rSendCommand.val,1	//MODE CHANGE\
+  print rSendData.val				//VALUE\
+  printh FF										//MAGIC\
+  printh FF										//MAGIC\
+  printh 73										//ETX\
+  rSendNeed.val=0\
+  if(rSendCommand.val==1)\
+  \{\
+    //Hide Mode Buttons\
+    page px\
+  \}else if(rSendCommand.val==17)\
+  \{\
+    //Hide Tune Step Buttons\
+    page px\
+  \}\
+\}\
+//===================================\
+// Process for MCU -> Nextion LCD\
+//===================================\
+// Always display (Graphic or Text Mode)\
+//===================================\
+// Check condition for Frequency Shift display (CWL, CWU)\
+// if changed Current Frequency, Mode, sys2 = 1\
+sys2=0\
+// Current FREQ Display\
+if(pm.vc.val!=-1)\
+\{\
+  if(nTemp4.val!=1)\
+  \{\
+    //Save Last received Freq\
+    nLastFreq.val=pm.vc.val\
+    //if changed vfo, replace vlMainVFO Value\
+    //Display Hz\
+    nTemp0.val=pm.vc.val%1000\
+    cov nTemp0.val,txtFreqHz.txt,3\
+    //Display Khz\
+    pm.vc.val/=1000\
+    nTemp0.val=pm.vc.val%1000\
+    cov nTemp0.val,txtFreqKHz.txt,3\
+    //Display Mhz\
+    pm.vc.val/=1000\
+    cov pm.vc.val,txtFreqMHz.txt,0\
+    pm.vc.val=-1\
+    sys2=1\
+  \}\
+\}\
+//TX/RX Status\
+if(pm.ct.val!=-1)\
+\{\
+  if(pm.ct.val==0)\
+  \{\
+    //RX\
+    qInTX.picc=0\
+    vis swr,0\
+    vis pwr,0\
+    TxMode.val=0\
+    pswr.fwdPowerSave.val=0\
+    pswr.swrSave.val=10\
+    pswr.SWRBarSave.val=0\
+  \}else\
+  \{\
+    //TX\
+    qInTX.picc=1\
+    vis swr,1\
+    vis pwr,1\
+    TxMode.val=1\
+  \}\
+  pm.ct.val=-1\
+\}\
+//TX STOP Status\
+if(pm.cx.val!=-1)\
+\{\
+  if(pm.cx.val==0)\
+  \{\
+    //TX\
+    qTXStop.picc=0\
+  \}else\
+  \{\
+    //RX\
+    qTXStop.picc=1\
+  \}\
+  pm.cx.val=-1\
+\}\
+//Display Active A/B\
+if(pm.cv.val!=-1)\
+\{\
+  if(pm.cv.val==0)\
+  \{\
+    bVFOAB.txt="VFO.A"\
+  \}else\
+  \{\
+    bVFOAB.txt="VFO.B"\
+  \}\
+  nActiveVFO.val=pm.cv.val\
+  pm.cv.val=-1\
+\}\
+//Display Current Mode\
+if(pm.cc.val!=-1)\
+\{\
+  //Save Last received Freq\
+  nLastMode.val=pm.cc.val\
+  if(pm.cc.val==2)\
+  \{\
+    bMode.txt="LSB"\
+  \}else if(pm.cc.val==3)\
+  \{\
+    bMode.txt="USB"\
+  \}else if(pm.cc.val==4)\
+  \{\
+    bMode.txt="CWL"\
+  \}else if(pm.cc.val==5)\
+  \{\
+    bMode.txt="CWU"\
+  \}\
+  pm.cc.val=-1\
+  sys2=1\
+\}\
+//Display Dial Lock\
+if(pm.cl.val!=-1)\
+\{\
+  if(pm.cl.val==0)\
+  \{\
+    //UnLock\
+    qLock.picc=0\
+    //UnLock all Thouch area\
+    tsw 255,1\
+  \}else\
+  \{\
+    //Lock\
+    qLock.picc=1\
+    tsw 255,0\
+    tsw qLock,1\
+  \}\
+  pm.cl.val=-1\
+\}\
+//SDR Mode\
+if(pm.cj.val!=-1)\
+\{\
+  if(pm.cj.val==0)\
+  \{\
+    //RX\
+    bSDR.txt="SPK"\
+    bSDR.picc=0\
+  \}else\
+  \{\
+    //TX\
+    bSDR.txt="SDR"\
+    bSDR.picc=1\
+  \}\
+  pm.cj.val=-1\
+\}\
+//IFS Graph\
+if(pm.vi.val!=-1)\
+\{\
+  //Display IFS Graph\
+  //Offset change, range -20000 ~ +20000 => 0 ~ 4000\
+  nIFS.val=pm.vi.val\
+  if(pm.vi.val<-2000)\
+  \{\
+    pm.vi.val=-2000\
+  \}else if(pm.vi.val>2000)\
+  \{\
+    pm.vi.val=2000\
+  \}\
+  pm.vi.val+=2000	//0~4000\
+  hIFS.val=pm.vi.val\
+  pm.vi.val=-1\
+  vis hIFS,1\
+\}\
+//===========================================\
+//Display CW Options\
+//===========================================\
+if(pm.vt.val!=-1)\
+\{\
+  nTone.val=pm.vt.val\
+  pm.vt.val=-1\
+  sys2=1\
+\}\
+if(pm.ck.val!=-1)\
+\{\
+  if(pm.ck.val==0)\
+  \{\
+    tKey.txt="Straight"\
+  \}else if(pm.ck.val==1)\
+  \{\
+    tKey.txt="IAMBICA"\
+  \}else if(pm.ck.val==2)\
+  \{\
+    tKey.txt="IAMBICB"\
+  \}\
+  tQKeyType.txt=tKey.txt\
+  pm.ck.val=-1\
+\}\
+if(pm.vs.val!=-1)\
+\{\
+  nWPM.val=1200/pm.vs.val\
+  nQWPM.val=nWPM.val\
+  pm.vs.val=-1\
+\}\
+if(pm.vy.val!=-1)\
+\{\
+  nDelay.val=pm.vy.val*10\
+  pm.vy.val=-1\
+\}\
+if(pm.ve.val!=-1)\
+\{\
+  nSDelay.val=pm.ve.val*2\
+  pm.ve.val=-1\
+\}\
+//========================================\
+//Display Boot Message\
+//========================================\
+if(pm.cm.val==1)\
+\{\
+  pm.cm.val=-1\
+  tCallSign.txt=pm.sc.txt\
+  tVersion.txt=pm.sv.txt\
+\}\
+//===================================\
+// Select Graphic Mode / Text Mode\
+//===================================\
+if(pm.c0.val!=nDispStatus.val)\
+\{\
+  if(pm.c0.val==1)	//Text Mode\
+  \{\
+    vis t0,1\
+    vis t1,1\
+  \}else\
+  \{\
+    vis nCWNum,0\
+    vis tCWText,0\
+    vis t0,0\
+    vis t1,0\
+    vis bAction,0\
+    t1.txt=""\
+  \}\
+  nDispStatus.val=pm.c0.val\
+\}\
+//========================================\
+//Text Line Mode for compatible with Character LCD\
+//========================================\
+if(nDispStatus.val==1)\
+\{\
+  //CW Text Mode Check\
+  if(pm.cy.val!=-1)\
+  \{\
+    //CW Text Mode\
+    if(pm.cy.val==1)\
+    \{\
+      vis nCWNum,1\
+      vis tCWText,1\
+    \}else\
+    \{\
+      //Normal Text Mode\
+      vis nCWNum,0\
+      vis tCWText,0\
+    \}\
+    pm.cy.val=-1\
+  \}\
+  if(pm.cw.val!=-1)\
+  \{\
+    nCWNum.val=pm.cw.val\
+    pm.cw.val=-1\
+  \}\
+  if(pm.sa.txt!="JJ")\
+  \{\
+    tCWText.txt=pm.sa.txt\
+    pm.sa.txt="JJ"\
+  \}\
+  if(pm.s0.txt!="JJ")\
+  \{\
+    t0.txt=pm.s0.txt\
+    pm.s0.txt="JJ"\
+  \}\
+  if(pm.s1.txt!="JJ")\
+  \{\
+    t1.txt=pm.s1.txt\
+    pm.s1.txt="JJ"\
+    substr t1.txt,sTemp0.txt,0,4\
+    if(sTemp0.txt=="PTT-")\
+    \{\
+      vis bAction,1\
+    \}else\
+    \{\
+      vis bAction,0\
+    \}\
+  \}\
+  //===========================================\
+  //ATT, IFS\
+  //===========================================\
+  //ATT Changing from Text Mode\
+  if(pm.vf.val!=-1)\
+  \{\
+    hATT.val=pm.vf.val\
+    nATT.val=pm.vf.val\
+  \}\
+  //IFS Changing from Text Mode\
+  if(pm.ci.val!=-1)\
+  \{\
+    if(pm.ci.val==0)\
+    \{\
+      vis hIFS,0\
+    \}else\
+    \{\
+      vis hIFS,1\
+    \}\
+  \}\
+\}else\
+\{\
+  //========================================\
+  //Graphic Mode\
+  //========================================\
+  nTemp0.val=-1\
+  nTemp1.val=-1\
+  //Display Other VFO\
+  if(nActiveVFO.val==0)\
+  \{\
+    //Other VFO is B\
+    nTemp0.val=pm.vb.val\
+    nTemp1.val=pm.cb.val\
+  \}else\
+  \{\
+    //Other VFO is A\
+    nTemp0.val=pm.va.val\
+    nTemp1.val=pm.ca.val\
+  \}\
+  if(nLastSubFreq.val!=nTemp0.val)\
+  \{\
+    nLastSubFreq.val=nTemp0.val\
+    nSubFreq.val=nTemp0.val\
+  \}\
+  //Other VFO is B\
+  if(nLastSubMode.val!=nTemp1.val)\
+  \{\
+    nLastSubMode.val=nTemp1.val\
+    if(nTemp1.val==2)\
+    \{\
+      tSubMode.txt="LSB"\
+    \}else if(nTemp1.val==3)\
+    \{\
+      tSubMode.txt="USB"\
+    \}else if(nTemp1.val==4)\
+    \{\
+      tSubMode.txt="CWL"\
+    \}else if(nTemp1.val==5)\
+    \{\
+      tSubMode.txt="CWU"\
+    \}\
+  \}\
+  //Draw Smeter\
+  if(pm.cp.val!=-1)\
+  \{\
+    jSMeter.val=pm.cp.val\
+    //jSMeter.val=pm.cp.val*10\
+    pm.cp.val=-1\
+  \}\
+  //Display tune step\
+  if(pm.cn.val!=-1)\
+  \{\
+    if(pm.cn.val==1)\
+    \{\
+      nTuneStep.val=pm.v1.val\
+    \}else if(pm.cn.val==2)\
+    \{\
+      nTuneStep.val=pm.v2.val\
+    \}else if(pm.cn.val==3)\
+    \{\
+      nTuneStep.val=pm.v3.val\
+    \}else if(pm.cn.val==4)\
+    \{\
+      nTuneStep.val=pm.v4.val\
+    \}else if(pm.cn.val==5)\
+    \{\
+      nTuneStep.val=pm.v5.val\
+    \}\
+    pm.cn.val=-1\
+  \}\
+  //Option Display\
+  //Split\
+  if(pm.cs.val!=-1)\
+  \{\
+    if(pm.cs.val==0)\
+    \{\
+      qSPL.picc=0\
+    \}else\
+    \{\
+      qSPL.picc=1\
+    \}\
+    pm.cs.val=-1\
+  \}\
+  //RIT\
+  if(pm.cr.val!=-1)\
+  \{\
+    if(pm.cr.val==0)\
+    \{\
+      qRIT.picc=0\
+    \}else\
+    \{\
+      qRIT.picc=1\
+    \}\
+    pm.cr.val=-1\
+  \}\
+  //===========================================\
+  //ATT, IFS\
+  //===========================================\
+  //ATT\
+  if(pm.vf.val!=-1)\
+  \{\
+    if(pm.vf.val==0)\
+    \{\
+      qATT.picc=0\
+    \}else\
+    \{\
+      qATT.picc=1\
+    \}\
+    hATT.val=pm.vf.val\
+    nATT.val=pm.vf.val\
+    pm.vf.val=-1\
+  \}\
+  //IFS\
+  if(pm.ci.val!=-1)\
+  \{\
+    if(pm.ci.val==0)\
+    \{\
+      qIFS.picc=0\
+      vis hIFS,0\
+    \}else\
+    \{\
+      qIFS.picc=1\
+      vis hIFS,1\
+    \}\
+    pm.ci.val=-1\
+  \}\
+\}\
+//Frequency Shift display for CWL, CWU\
+if(sys2==1)\
+\{\
+  //Changed Frequency or Mode\
+  if(pm.ch.val==1)				//Frequency Shiftdisplay\
+  \{\
+    if(nLastMode.val==4)	//CWL\
+    \{\
+      sys2=nLastFreq.val-nTone.val\
+      sys2+=pm.vh.val			//Find adjust frequency for cwl, cwu by user's configuration\
+    \}else if(nLastMode.val==5)	//CWU\
+    \{\
+      sys2=nLastFreq.val+nTone.val\
+      sys2+=pm.vh.val			//Find adjust frequency for cwl, cwu by user's configuration\
+    \}else\
+    \{\
+      sys2=nLastFreq.val\
+    \}\
+  \}\
+  if(sys2!=1)	//applied shift value\
+  \{\
+    nTemp0.val=sys2%1000\
+    cov nTemp0.val,txtFreqHz.txt,3\
+    //Display Khz\
+    sys2/=1000\
+    nTemp0.val=sys2%1000\
+    cov nTemp0.val,txtFreqKHz.txt,3\
+    //Display Mhz\
+    sys2/=1000\
+    cov sys2,txtFreqMHz.txt,0\
+  \}\
+  sys2=-1\
+\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tm1
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 if(pm.sp.txt!="J")\
+\{\
+  if(qInfo.picc==0)\
+  \{\
+    qInfo.picc=1\
+  \}\
+  if(vDecodeVisible.val==1)\
+  \{\
+    vis tDecode1,0\
+    vDecodeVisible.val=0\
+  \}\
+  sNewMax.txt=""\
+  sys2=0\
+  sys1=0\
+  nTemp0.val=0\
+  for(sys0=0;sys0<62;sys0++)\
+  \{\
+    substr pm.sp.txt,sTemp0.txt,sys0*2,2\
+    covx sTemp0.txt,sys2,2,2\
+    sys2/=2\
+    if(sys1<sys2)\
+    \{\
+      sys1=sys2\
+      nTemp0.val=sys0\
+    \}\
+    if(sys2<0)\
+    \{\
+      sys2=0\
+    \}\
+    if(sys2>70)\
+    \{\
+      sys2=70\
+    \}\
+    substr sMax.txt,sTemp1.txt,sys0*2,2\
+    covx sTemp1.txt,nTemp1.val,2,2\
+    if(nTemp1.val<sys2)\
+    \{\
+      nTemp1.val=sys2\
+    \}else\
+    \{\
+      nTemp1.val*=9\
+      nTemp3.val=sys2*1\
+      nTemp1.val+=nTemp3.val\
+      nTemp1.val/=10\
+    \}\
+    covx nTemp1.val,sTemp1.txt,2,2\
+    substr sTemp1.txt,sTemp1.txt,2,2\
+    sNewMax.txt+=sTemp1.txt\
+    if(sys0<18)\
+    \{\
+      if(sys2>52)\
+      \{\
+        sys2=52\
+      \}\
+      if(nTemp1.val>52)\
+      \{\
+        nTemp1.val=52\
+      \}\
+      fill sys0*2+1,238-nTemp1.val,2,nTemp1.val,1342	//1500+sys1*2046\
+      fill sys0*2+1,238-sys2,2,sys2,57343	//1500+sys1*2046\
+      fill sys0*2+1,186,2,52-nTemp1.val,7		//1500+sys1*2046\
+    \}else\
+    \{\
+      fill sys0*2+1,238-nTemp1.val,2,nTemp1.val,1342	//1500+sys1*2046\
+      fill sys0*2+1,238-sys2,2,sys2,57343	//1500+sys1*2046\
+      fill sys0*2+1,168,2,70-nTemp1.val,7		//1500+sys1*2046\
+    \}\
+    //if(sys1>nADCDisVal.val)					//maximum adc dccharget\
+    //\{\
+    //  sys2=sys1-nADCDisVal.val\
+    //\}\
+    //sys2=sys1*90	//80%\
+    //sys2/=100\
+  \}\
+  sMax.txt=sNewMax.txt\
+  if(sys1>50)\
+  \{\
+    sys1=63488\
+  \}else if(sys1>40)\
+  \{\
+    sys1=64528\
+  \}else if(sys1>30)\
+  \{\
+    sys1=58584\
+  \}else if(sys1>20)\
+  \{\
+    sys1=39566\
+  \}else if(sys1>10)\
+  \{\
+    sys1=33549\
+  \}else\
+  \{\
+    sys1=31727\
+  \}\
+  //nTemp0.val=nTemp0.val*47\
+  //nTemp0.val=nTemp0.val+30\
+  nTemp0.val=nTemp0.val*50\
+  nTemp0.val=nTemp0.val+50\
+  cov nTemp0.val,sTemp0.txt,0\
+  //xstr 1,170,90,18,0,WHITE,10565,0,1,1,sTemp0.txt\
+  xstr 1,170,37,18,0,sys1,7,2,1,1,sTemp0.txt\
+  pm.sp.txt="J"\
+\}\
+if(pm.sb.txt!="^")\
+\{\
+  if(vDecodeVisible.val==0)\
+  \{\
+    vis tDecode1,1\
+    vDecodeVisible.val=1\
+  \}\
+  strlen tDecode1.txt,sys0\
+  if(sys0>22)\
+  \{\
+    substr tDecode1.txt,tDecode1.txt,1,sys0-1\
+  \}\
+  tDecode1.txt=tDecode1.txt+pm.sb.txt\
+  pm.sb.txt="^"\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tm2
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 //If Graphic mode\
+if(nDispStatus.val==0)\
+\{\
+  add 17,0,jSMeter.val/3\
+\}\
+sys2=pm.vq.val&0x07\
+if(sys2>0)\
+\{\
+  //check Now condition\
+  //if(dim==0)\
+  if(nSaverCount.val==-10)				//Screen Saver Mode\
+  \{\
+    //Screen Saver Mode\
+    if(nLastFreq.val!=nSaverFreq.val)\
+    \{\
+      dim=dims\
+      nSaverCount.val=0\
+    \}\
+  \}else if(nSaverCount.val!=-20)	//Screen off by remote control -> disabled screen saver, always backlight off\
+  \{\
+    //Running Mode\
+    if(nLastFreq.val!=nSaverFreq.val)\
+    \{\
+      nSaverFreq.val=nLastFreq.val\
+      nSaverCount.val=0\
+    \}else\
+    \{\
+      nSaverCount.val++\
+      if(sys2==1)\
+      \{\
+        if(nSaverCount.val>=180)	//3 Min\
+        \{\
+          dim=0\
+          nSaverCount.val=-10\
+        \}\
+      \}else if(sys2==2)\
+      \{\
+        if(nSaverCount.val>=600)		//10 Min\
+        \{\
+          dim=0\
+          nSaverCount.val=-10\
+        \}\
+      \}else if(sys2==3)\
+      \{\
+        if(nSaverCount.val>=1200)		//20 Min\
+        \{\
+          dim=0\
+          nSaverCount.val=-10\
+        \}\
+      \}\
+    \}\
+  \}\
+\}\
+if(pm.vg.val==74)				//Loopback Process\
+\{\
+  pm.vg.val=-1\
+  //sys0 : Sender, sys1 : Command\
+  sys2=pm.vv.val				//Loop back Value\
+  pm.vv.val=0						//Init value for Next Receive process\
+  sys0=sys2&0xFF				//Sender\
+  //Loopback Signal\
+  if(sys0>4)						//Sender < 5, ignore\
+  \{\
+    sys2=sys2>>8\
+    sys1=sys2&0xFF			//Command\
+    if(sys1==10)				//Command : Backlight Off\
+    \{\
+      sys2=sys2>>8			//\
+      sys1=sys2&0xFF		//Data1\
+      sys2=sys2>>8			//Data2 (Checksum\
+      sys2=sys2&0xFF\
+      sys0=sys0+sys1+10	//sender + command(10) + data1\
+      sys0=sys0%256\
+      if(sys0==sys2)		//Check Checksum\
+      \{\
+        //Backlight Off\
+        nSaverCount.val=-20	//Backlight off by Remote control\
+        dim=0\
+      \}\
+    \}else if(sys1==11)		//Command : Backlight On\
+    \{\
+      sys2=sys2>>8			//\
+      sys1=sys2&0xFF		//Data1\
+      sys2=sys2>>8			//Data2 (Checksum\
+      sys2=sys2&0xFF\
+      sys0=sys0+sys1+11	//sender + command(10) + data1\
+      sys0=sys0%256\
+      if(sys0==sys2)		//Check Checksum\
+      \{\
+        //Backlight Off\
+        dim=dims\
+        nSaverCount.val=0\
+      \}\
+    \}\
+  \}\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 tmSwr
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 if(pm.cm.val!=-1)\
+\{\
+  if(pm.cm.val==2)\
+  \{\
+    pswr.fwdPowerSave.val=pm.vm.val/10\
+  \}else if(pm.cm.val==3)\
+  \{\
+    pswr.swrSave.val=pm.vm.val/10\
+    pswr.SWRBarSave.val=pm.vm.val\
+    if(pswr.SWRBarSave.val<200)\
+    \{\
+      pswr.SWRBarSave.val-=100\
+      pswr.SWRBarSave.val*=2\
+    \}\
+    pswr.SWRBarSave.val/=10\
+  \}\
+  pm.cm.val=-1\
+  holdNum.val=pswr.swrSave.val/10\
+  cov holdNum.val,holdStr.txt,0\
+  swr.txt="SWR "\
+  swr.txt+=holdStr.txt\
+  swr.txt+="."\
+  holdNum.val=pswr.swrSave.val%10\
+  cov holdNum.val,holdStr.txt,0\
+  swr.txt+=holdStr.txt\
+  // pwr\
+  holdNum.val=pswr.fwdPowerSave.val/10\
+  cov holdNum.val,holdStr.txt,0\
+  pwr.txt=holdStr.txt\
+  pwr.txt+="."\
+  holdNum.val=pswr.fwdPowerSave.val%10\
+  cov holdNum.val,holdStr.txt,0\
+  pwr.txt+=holdStr.txt\
+  pwr.txt+=" W"\
+\}\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs43\fsmilli21750 \cf0 swrIssue
+\f1\b0\fs24 \
+\pard\pardeftab720\partightenfactor0
+\cf0 if(swr.bco!=0)\
+\{\
+  swr.bco=0\
+  swr.pco=65535   //white\
+\}else if(pswr.swrSave.val>=30)\
+\{\
+  swr.bco=63488   // red\
+  swr.pco=65535   //white\
+\}else if(pswr.swrSave.val>=20)\
+\{\
+  swr.bco=65504   //yellow\
+  swr.pco=0       //black\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+}
