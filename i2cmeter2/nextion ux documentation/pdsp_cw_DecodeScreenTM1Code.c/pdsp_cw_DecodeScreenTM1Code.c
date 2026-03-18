@@ -1,14 +1,14 @@
 if (pm.sp.txt != "J") {                         //If not "J", indicates buffer to be processed, J=74 or 4A
-  sys1 = nDecodeFreq.val / 50 
+  sys1 = nDecodeFreq.val / 50                   // example = 800/50 = 16
   sys1 = sys1 + 1 
-  vSelectMin.val = sys1 - 1 
-  vSelectMax.val = sys1 + 1 
-  sys1 = sys1* 4 
+  vSelectMin.val = sys1 - 1                     //16
+  vSelectMax.val = sys1 + 1                     //18
+  sys1 = sys1* 4                                //17*4= 68 
   sys2 = 0 
-  for (sys0 = 0; sys0 < 62; sys0++) {
+  for (sys0 = 0; sys0 < 62; sys0++) {            //Signals mapped to constrained to 0-255. Above 255 is 255
     substr pm.sp.txt, sTemp0.txt, sys0 * 2, 2   //From sys0*2, take 2 characters and store in sTemp0.txt
     covx sTemp0.txt, sys2, 2, 2                 //Convert sTemp0.txt to number, 2 bytes, leading zeros 2
-    sys2 /= 2 
+    sys2 /= 2                             // With ADC 0-255, further divide by 2 and max at 70 (i.e., 200/2 -> 70) 
     if (sys2 < 0) {
       sys2 = 0
     }
@@ -27,10 +27,10 @@ if (pm.sp.txt != "J") {                         //If not "J", indicates buffer t
     // this just puts a red vertical bar at plus/minus one slot (there are 62)
     // current freq target (decoded)
 
-    if (sys0 > vSelectMin.val) {
+    if (sys0 > vSelectMin.val) {            //only 17 qualifies
       if (sys0 < vSelectMax.val) {
-        line sys1, 40, sys1, 109, RED 
-        line sys1+4, 40, sys1+4, 109, RED
+        line sys1, 40, sys1, 109, RED       //68 first line 
+        line sys1+4, 40, sys1+4, 109, RED   //72 second line
       }
     }
   }
@@ -93,7 +93,8 @@ if (pm.sp.txt != "J") {                         //If not "J", indicates buffer t
   prints 2,1              //Loop Command1 : Command Type / 1~5: Read Configuration
   prints 0x6A,1           //Loop Command2 : Command Value / 0x6A to DSP
   sys0 = nMyAddr.val + 2 + 0x6A  //Byte0 + Byte1 + Byte2 % 256 = Checksum
-  sys0 = sys0 % 256 prints sys0,1                //Loop Command3 : Command Value / CheckSum
+  sys0 = sys0 % 256 
+  prints sys0,1                //Loop Command3 : Command Value / CheckSum
   printh FF               //MAGIC
   printh FF               //MAGIC
   printh 73               //ETX
