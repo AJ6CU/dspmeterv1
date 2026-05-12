@@ -21,13 +21,13 @@ WC8C, Dennis Cabell
 // put baud=<rate> on the first line, for example:
 // baud=57600
 ///////////////////////////////////////////////////
-//#define SERIAL_SPEED 57600
-#define SERIAL_SPEED 9600
+#define SERIAL_SPEED 57600
+// #define SERIAL_SPEED 9600
 
 ///////////////////////////////
 // power swr configuration
 ///////////////////////////////
-#define ENABLE_POWER_SWR_METER// comment this line out if you dont have the power/swr meter lines connected
+// #define ENABLE_POWER_SWR_METER// comment this line out if you dont have the power/swr meter lines connected
 
 ///////////////////////////////
 // S-Meter Calibration

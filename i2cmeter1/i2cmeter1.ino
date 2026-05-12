@@ -644,10 +644,10 @@ void setup()
   Wire.onRequest(I2CRequestEvent);
   
 #ifdef USE_SW_SERIAL
-  SWSerial_Begin(9600);
+  SWSerial_Begin(57600);
 #endif  
 
-  Serial.begin(9600, SERIAL_8N1);
+  Serial.begin(57600, SERIAL_8N1);
   Serial.flush();
   SAMPLE_INTERVAL = round(1000000 * (1.0 / SAMPLE_PREQUENCY));
   CalculateCoeff(cwDecodeHz);  //Set 750Hz //9 * 50 + 300 = 750Hz
